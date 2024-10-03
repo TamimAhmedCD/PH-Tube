@@ -1,9 +1,8 @@
-function getTime (time) {
+function getTime(time) {
   const hour = parseInt(time / 3600);
   let remainderSecond = time % 3600;
   const minute = parseInt(remainderSecond / 60);
-  remainderSecond = remainderSecond % 60;
-  return `${hour} hour ${minute} minute ${remainderSecond} second ago`
+  return `${hour} hrs ${minute} min ago`;
 }
 
 const loadCategories = () => {
@@ -19,6 +18,13 @@ const loadVideos = () => {
     .then((data) => displayVideos(data.videos))
     .catch((err) => console.log(err));
 };
+
+const loadCategoriesVideos = (id) => {
+  fetch(`https://openapi.programming-hero.com/api/phero-tube/category/${id}`)
+    .then((res) => res.json())
+    .then((data) => displayVideos(data.category))
+    .catch((err) => console.log(err));
+}
 
 // {
 //     "category_id": "1003",
@@ -41,6 +47,7 @@ const loadVideos = () => {
 
 const displayVideos = (videos) => {
   const videoContainer = document.getElementById("videos");
+  videoContainer.innerHTML = "";
 
   videos.forEach((video) => {
     console.log(video);
@@ -53,7 +60,13 @@ const displayVideos = (videos) => {
                 src=${video.thumbnail}
                 class = "h-full w-full object-cover"
                 alt="Shoes" />
-            ${video.others.posted_date?.length == 0 ? "" : `<span class = "absolute right-2 bottom-2 bg-gray-900 text-white rounded p-1">${getTime(video.others.posted_date)}</span>`}    
+            ${
+              video.others.posted_date?.length == 0
+                ? ""
+                : `<span class = "absolute right-2 bottom-2 text-xs bg-gray-900 text-white rounded p-1">${getTime(
+                    video.others.posted_date
+                  )}</span>`
+            }    
         </figure>
         <div class="px-0 py-2 flex gap-2">
             <div>
@@ -87,11 +100,9 @@ const displayCategories = (categories) => {
   categories.forEach((item) => {
     console.log(item);
 
-    const button = document.createElement("button");
-
-    button.classList = "btn";
-    button.innerText = item.category;
-    categoryContainer.append(button);
+    const buttonContainer = document.createElement("div");
+    buttonContainer.innerHTML = `<button onclick = "loadCategoriesVideos(${item.category_id})" class="btn">${item.category}</button>`
+    categoryContainer.append(buttonContainer);
   });
 };
 
