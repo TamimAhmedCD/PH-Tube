@@ -5,6 +5,14 @@ function getTime(time) {
   return `${hour} hrs ${minute} min ago`;
 }
 
+const removeActiveClass = () => {
+  const buttons = document.getElementsByClassName('category-btn');
+  console.log(buttons);
+  for (let btn of buttons) {
+    btn.classList.remove('active');
+  }
+};
+
 const loadCategories = () => {
   fetch("https://openapi.programming-hero.com/api/phero-tube/categories")
     .then((res) => res.json())
@@ -22,9 +30,16 @@ const loadVideos = () => {
 const loadCategoriesVideos = (id) => {
   fetch(`https://openapi.programming-hero.com/api/phero-tube/category/${id}`)
     .then((res) => res.json())
-    .then((data) => displayVideos(data.category))
+    .then((data) => {
+      removeActiveClass();
+
+      const activeBtn = document.getElementById(`btn-${id}`);
+      activeBtn.classList.add("active");
+
+      displayVideos(data.category);
+    })
     .catch((err) => console.log(err));
-}
+};
 
 // {
 //     "category_id": "1003",
@@ -50,17 +65,16 @@ const displayVideos = (videos) => {
   videoContainer.innerHTML = "";
 
   if (videos.length === 0) {
-    videoContainer.classList.remove('grid')
+    videoContainer.classList.remove("grid");
     videoContainer.innerHTML = `
     <div class = "min-h-[300px] flex flex-col gap-5 justify-center items-center">
       <img src = "./images/icon.png"/>
       <h2 class = "text-center text-2xl font-bold">No Content Here in this Category</h2>
     </div>
-    `
+    `;
     return;
-  }
-  else {
-    videoContainer.classList.add('grid');
+  } else {
+    videoContainer.classList.add("grid");
   }
 
   videos.forEach((video) => {
@@ -115,7 +129,7 @@ const displayCategories = (categories) => {
     console.log(item);
 
     const buttonContainer = document.createElement("div");
-    buttonContainer.innerHTML = `<button onclick = "loadCategoriesVideos(${item.category_id})" class="btn">${item.category}</button>`
+    buttonContainer.innerHTML = `<button id = "btn-${item.category_id}" onclick = "loadCategoriesVideos(${item.category_id})" class="btn category-btn">${item.category}</button>`;
     categoryContainer.append(buttonContainer);
   });
 };
